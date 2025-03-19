@@ -1,0 +1,108 @@
+ CREATE TABLE clienti (
+    id_clienti INT PRIMARY KEY,
+    nume VARCHAR(50),
+    email VARCHAR(150) 
+);
+
+CREATE TABLE produs (
+    id_produs INT PRIMARY KEY,
+    nume VARCHAR(30) NOT NULL,
+    cod CHAR(5)
+);
+
+CREATE TABLE client_produse (
+    id_clienti INT,
+    id_produs INT,
+    PRIMARY KEY(id_clienti, id_produs),
+    FOREIGN KEY (id_clienti) REFERENCES clienti(id_clienti),
+    FOREIGN KEY (id_produs) REFERENCES produs(id_produs)
+);
+
+
+ALTER TABLE clienti
+ADD COLUMN data_nasterii DATE;
+
+
+ALTER TABLE clienti 
+MODIFY email VARCHAR(150);
+
+DROP TABLE client_produse;
+
+TRUNCATE TABLE clienti;
+
+
+INSERT INTO clienti (id_clienti, nume, email)
+VALUES (1, 'Ion Popescu', 'ion.popescu@email.com');
+
+INSERT INTO clienti
+VALUES (2, 'Maria Ionescu', 'maria.ionescu@email.com');
+
+UPDATE clienti
+SET email = 'ion.popescu2024@email.com'
+WHERE id_clienti = 1;
+
+UPDATE clienti
+SET email = 'default@email.com'; -- TOATE emailurile vor fi schimbate!
+
+DELETE FROM clienti
+WHERE id_clienti = 2;
+
+DELETE FROM clienti; -- TOȚI clienții vor fi șterși!
+
+SELECT * FROM clienti;
+
+SELECT nume, email FROM clienti;
+
+SELECT * FROM clienti WHERE id_clienti = 1;
+
+SELECT * FROM clienti WHERE nume LIKE 'Ion%';
+
+SELECT * FROM clienti
+WHERE nume LIKE 'I%' AND email LIKE '%@gmail.com';
+
+SELECT * FROM clienti
+WHERE nume LIKE 'I%' OR email LIKE '%@yahoo.com';
+
+SELECT COUNT(*) AS numar_clienti FROM clienti;
+
+SELECT nume, COUNT(*) AS numar_produs 
+FROM produs 
+GROUP BY nume
+HAVING COUNT(*) > 10;
+
+SELECT clienti.nume, produs.nume
+FROM clienti
+INNER JOIN client_produse ON clienti.id_clienti = client_produse.id_clienti
+INNER JOIN produs ON client_produse.id_produs = produs.id_produs;
+
+SELECT clienti.nume, produs.nume
+FROM clienti
+LEFT JOIN client_produse ON clienti.id_clienti = client_produse.id_clienti
+LEFT JOIN produs ON client_produse.id_produs = produs.id_produs;
+
+SELECT clienti.nume, produs.nume
+FROM clienti
+RIGHT JOIN client_produse ON clienti.id_clienti = client_produse.id_clienti
+RIGHT JOIN produs ON client_produse.id_produs = produs.id_produs;
+
+SELECT clienti.nume, produs.nume
+FROM clienti
+CROSS JOIN produs;
+
+SELECT * FROM clienti ORDER BY nume ASC;
+
+SELECT * FROM clienti ORDER BY nume ASC LIMIT 5;
+
+SELECT nume FROM clienti 
+WHERE id_clienti IN (SELECT id_clienti FROM comenzi);
+
+SELECT nume, (SELECT COUNT(*) FROM comenzi WHERE comenzi.id_clienti = clienti.id_clienti) AS numar_produse
+FROM clienti;
+
+SELECT nume_produs, pret FROM produs 
+WHERE pret > (SELECT AVG(pret) FROM produs);
+
+SELECT id_produs, COUNT(*) AS total_vanzari
+FROM vanzari
+GROUP BY id_produs
+HAVING COUNT(*) > (SELECT AVG(total_vanzari) FROM (SELECT COUNT(*) AS total_vanzari FROM vanzari GROUP BY id_produs) AS subquery);
