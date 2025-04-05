@@ -144,6 +144,15 @@ FROM vanzari
 GROUP BY id_produs
 HAVING COUNT(*) > (SELECT AVG(total_vanzari) FROM (SELECT COUNT(*) AS total_vanzari FROM vanzari GROUP BY id_produs) AS subquery);
 
+
+EXAMPLE QUERIES:
+
+-- Clients who purchased at least one product
+SELECT clienti.nume, produs.nume
+FROM clienti
+INNER JOIN client_produse ON clienti.id_clienti = client_produse.id_clienti
+INNER JOIN produs ON client_produse.id_produs = produs.id_produs;
+
 # Conclusions
 
 Throughout this project, we have learned and applied fundamental and advanced concepts related to database design and management. By working with DDL (Data Definition Language) statements such as CREATE, ALTER, and DROP, we gained a deeper understanding of how to structure a relational database efficiently.
